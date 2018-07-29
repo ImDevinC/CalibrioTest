@@ -1,23 +1,51 @@
 from requests import Session, Request
+import requests
 import sys
-from getpass import getpass
+from getpass import getpass, getuser
+from socket import gethostname
+import hashlib
+
+VERSION=1.0
 
 ROOT_URL = 'http://calabrio.tlcinternal.com'
 API_ROOT = ROOT_URL + '/api/rest'
 
 BASE_DATA = [{
-	"id": "recording",
-	"data": {
-		"domain": "corp",
-		"locale": "en"
+	'id': 'recording',
+	'data': {
+		'domain': 'corp',
+		'locale': 'en'
 	},
-	"userId": "",
-	"password": "",
-	"locale": "en"
+	'userId': '',
+	'password': '',
+	'locale': 'en'
 }]
 
+ANALYTICS_ID = 'UA-47032439-9'
+ANALYTICS_URL = 'https://google-analytics.com/collect'
+
+def sendAppLaunch():
+	try:
+		userId = getuser()
+		hostname = gethostname()
+		machineId = hashlib.sha256('{}:!:{}'.format(userId, hostname)).hexdigest()
+	except Exception as ex:
+		machineId = 'ERROR'
+	payload = {
+		'v': 1,
+		'tid': ANALYTICS_ID,
+		'uid': machineId,
+		't': 'event',
+		'av': VERSION,
+		'ec': 'applaunch',
+		'ea': 'applaunch',
+		'an': 'CalibrioTest'
+	}
+	r = requests.post(ANALYTICS_URL, data=payload, headers={'User-Agent': 'CalibrioTest-'.format(VERSION)})
+	
 
 if __name__ == '__main__':
+	sendAppLaunch()
 	user = input('Username: ')
 	password = getpass()
 	contactId = input('Contact ID: ')
@@ -45,7 +73,7 @@ if __name__ == '__main__':
 		print('Unable to login. Please try again.')
 		sys.exit(5)
 	print('Logged in successfully, requesting export of {}'.format(contactId))
-	data = { "mediaFormat": "wav" }
+	data = { 'mediaFormat': 'wav' }
 	headers = { 'X-CSRF-Token': token }
 	req = Request('post', API_ROOT + '/recording/contact/{}/export/'.format(contactId), json=data, headers=headers)
 	prep = ses.prepare_request(req)
