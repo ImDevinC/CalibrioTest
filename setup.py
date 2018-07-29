@@ -3,6 +3,6 @@ import py2exe
 
 setup(
 	options = {'py2exe':{'bundle_files': 1, 'compressed': True}},
-	console = [{'script': 'main.py'}],
+	console = [{'script': 'CalibrioTest.py'}],
 	zipfile = None
 )
