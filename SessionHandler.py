@@ -24,7 +24,7 @@ class SessionHandler:
 
     def authorize(self, username, password):
         data = BASE_DATA
-        data[0]['userId'] = username
+        data[0]['userId'] = username.strip()
         data[0]['password'] = password
         req = Request('POST', API_ROOT + '/authorize', json=data)
         prep = self.ses.prepare_request(req)
@@ -56,7 +56,7 @@ class SessionHandler:
     def requestContactExport(self, contactId):
         data = { 'mediaFormat': 'wav' }
         headers = { 'X-CSRF-Token': self.token }
-        req = Request('post', API_ROOT + '/recording/contact/{}/export/'.format(contactId), json=data, headers=headers)
+        req = Request('post', API_ROOT + '/recording/contact/{}/export/'.format(contactId.strip()), json=data, headers=headers)
         prep = self.ses.prepare_request(req)
         try:
             res = self.ses.send(prep)
