@@ -7,6 +7,7 @@ from Analytics import Analytics
 def showError(handler):
 	print(handler.getLastFriendlyError())
 	Analytics.sendAnalytics('AppError', handler.getLastError())
+	print('Press the Enter key to exit')
 	raw_input()
 	sys.exit(1)
 
@@ -24,10 +25,10 @@ if __name__ == '__main__':
 		showError(handler)
 	print('Requested export successfully, waiting for export to be ready.')
 	while not handler.isDownloadReady():
-		if not handler.checkIfExportIsReady(exportId):
+		if not handler.checkIfExportIsReady():
 			showError(handler)
-	print('Export is ready, beginning download')
-	if not handler.downloadExport(exportId):
+	print('Export is ready, beginning download, this could take a few minutes.')
+	if not handler.downloadExport():
 		showError(handler)
 	Analytics.sendAnalytics('AppEvent', 'AppCompleted')
 	print('Download completed')
